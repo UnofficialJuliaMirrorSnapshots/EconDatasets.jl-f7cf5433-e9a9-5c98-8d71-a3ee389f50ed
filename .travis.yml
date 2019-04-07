@@ -1,0 +1,19 @@
+language: cpp
+compiler:
+  - clang
+notifications:
+  email: false
+before_install:
+  - sudo add-apt-repository ppa:staticfloat/julia-deps -y
+  - sudo add-apt-repository ppa:staticfloat/juliareleases -y
+  - sudo apt-get update -qq -y
+  - sudo apt-get install libpcre3-dev julia -y
+script:
+  - julia -e 'versioninfo()'
+  - julia -e 'Pkg.clone("https://github.com/JuliaFinMetriX/JFinM_Charts.git")'
+  - julia -e 'Pkg.init(); Pkg.clone("https://github.com/JuliaFinMetriX/EconDatasets.jl.git")'
+  - julia -e 'Pkg.update()'
+  - julia --code-coverage ./test/runtests.jl
+after_success:
+  - julia -e 'cd(Pkg.dir("EconDatasets")); Pkg.add("Coverage"); using Coverage; Coveralls.submit(Coveralls.process_folder())'
+
